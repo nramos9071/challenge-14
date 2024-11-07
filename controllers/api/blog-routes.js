@@ -1,9 +1,9 @@
 const router = require('express').Router();
 
-const Blog = require('../models/Blog');
-const Comment = require('../models/Comment');
+const Blog = require('../../models/blog');
+const Comment = require('../../models/comment');
 
-const withAuth = require('../utils/auth');
+const withAuth = require('../../utils/auth');
 
 router.get('/', async (req, res) => {
   try {
@@ -26,3 +26,5 @@ router.get('/', async (req, res) => {
     res.status(500).json(err);
   }
 });
+
+module.exports = router;
