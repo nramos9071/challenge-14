@@ -4,9 +4,22 @@ const withAuth = require('../../utils/auth'); // Adjust the path as necessary
 // Route to render the homepage
 router.get('/', withAuth, async (req, res) => {
   try {
-    // Your existing code to fetch and render data
+    const blogData = await Blog.findAll({
+      limit: 10,
+      order: [['createdAt', 'DESC']],
+      include: [
+        {
+          model: Comment,
+          attributes: ['author', 'content', 'date_created'],
+        },
+      ],
+    });
+
+    const blogs = blogData.map((blog) => blog.get({ plain: true }));
+
     res.render('homepage', {
-      // Your data here
+      blogs,
+      logged_in: req.session.logged_in,
     });
   } catch (err) {
     res.status(500).json(err);

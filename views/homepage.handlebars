@@ -2,7 +2,16 @@
     <h2>Current Blogs</h2>
 
     <section>
-        <h3></h3>
+        {{#each blogs}}
+            <article>
+                <h3>{{this.title}}</h3>
+                <p>{{this.content}}</p>
+                <p>Author: {{this.author}}</p>
+                <p>Date Created: {{this.date_created}}</p>
+
+
+            </article>
+        {{/each}}
 
 
     </section>
