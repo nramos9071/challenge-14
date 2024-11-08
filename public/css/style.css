@@ -1,0 +1,48 @@
+body {
+    background-color: rgb(1, 3, 5);
+    color: rgb(255, 255, 255);
+}
+
+footer {
+    display: flex;
+    justify-content: center;
+}
+
+nav {
+    display: flex;
+    float: right;
+}
+
+li {
+    list-style-type: none;
+}
+
+
+
+.header {
+    display: flex;
+    background-color: rgb(80, 78, 78);
+    margin: 0;
+    padding: 0;
+
+}
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 50px;
+}
+
+.input-containers {
+    display: flex;
+}
+
+.register-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+   
+}
