@@ -2,8 +2,8 @@ const router = require('express').Router();
 
 const Blog = require('../../models/blog');
 const Comment = require('../../models/comment');
-
 const withAuth = require('../../utils/auth');
+const commentRoutes = require('./comment-routes');
 
 router.get('/', withAuth, async (req, res) => {
   try {
@@ -53,5 +53,7 @@ router.get('/:id', withAuth, async (req, res) => {
     res.status(500).json(err);
   }
 });
+
+router.use('/:blogId/comments', commentRoutes);
 
 module.exports = router;
