@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Update Bio</title>
+</head>
+<body>
+  <h1>Update Bio</h1>
+  <form id="update-bio-form">
+    <div>
+      <label for="bio">Bio:</label>
+      <textarea id="bio" name="bio" required>{{user.bio}}</textarea>
+    </div>
+    <input type="hidden" id="user-id" name="user-id" value="{{user.id}}">
+    <button type="submit">Update Bio</button>
+  </form>
+  <script src="/js/updateBio.js"></script>
+
+<script src="/js/updateBio.js"></script>
+</body>
+</html>

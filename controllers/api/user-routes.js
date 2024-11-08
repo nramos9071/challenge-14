@@ -15,7 +15,29 @@ router.get('/profile/:id', async (req, res) => {
 
     const user = userData.get({ plain: true });
 
-    res.render('profile', {
+    res.render('userpage', {
+      user,
+      logged_in: req.session.logged_in,
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+router.get('/update-bio/:id', async (req, res) => {
+  try {
+    const userData = await User.findByPk(req.params.id, {
+      attributes: { exclude: ['password'] },
+    });
+
+    if (!userData) {
+      res.status(404).json({ message: 'No user found with this id!' });
+      return;
+    }
+
+    const user = userData.get({ plain: true });
+
+    res.render('updateBio', {
       user,
       logged_in: req.session.logged_in,
     });
@@ -48,7 +70,8 @@ router.post('/login', async (req, res) => {
       });
   
     } catch (err) {
-      res.status(500).json(err);
+      console.error(err); // Log the error to the console
+      res.status(500).json({ message: 'Failed to log in', error: err.message });
     }
   });
 
@@ -68,6 +91,25 @@ router.post('/login', async (req, res) => {
     } catch (err) {
       console.error(err); // Log the error to the console
       res.status(400).json({ message: 'Failed to register', error: err.message });
+    }
+  });
+
+  router.put('/profile/:id', async (req, res) => {
+    try {
+      const updatedUser = await User.update(
+        { bio: req.body.bio },
+        { where: { id: req.params.id } }
+      );
+  
+      if (!updatedUser) {
+        res.status(404).json({ message: 'No user found with this id!' });
+        return;
+      }
+  
+      res.status(200).json({ message: 'Bio updated successfully!' });
+    } catch (err) {
+      console.error(err); // Log the error to the console
+      res.status(500).json({ message: 'Failed to update bio', error: err.message });
     }
   });
 

@@ -22,6 +22,10 @@ User.init({
             len: [8],
         },
     },
+    bio: { // Add the bio field
+        type: DataTypes.TEXT,
+        allowNull: true, // Allow null if bio is optional
+      },
 },
 {
     hooks: {

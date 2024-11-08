@@ -1,0 +1,26 @@
+<div>
+
+    <section>
+        <h2>{{user.username}}'s Profile</h2>
+    </section>
+
+</div>
+
+<div>
+    <section>
+        <h3>Bio</h3>
+        <p>{{user.bio}}</p>
+    </section>
+
+     <section>
+      <h3>Settings</h3>
+      <a href="/api/users/update-bio/{{user.id}}">Update Bio</a>
+      <a href="/change-password">Change Password</a>
+      <a href="/delete-account">Delete Account</a>
+    </section>
+    
+
+
+
+</div>
+<script src="../public/js/"

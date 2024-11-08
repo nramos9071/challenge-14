@@ -19,9 +19,16 @@ const loginHandler = async (event) => {
   }
 };
 
-document.querySelector('#login-form').addEventListener('submit', loginHandler);
+document.addEventListener('DOMContentLoaded', () => {
+  const loginForm = document.querySelector('#login-form');
+  if (loginForm) {
+    loginForm.addEventListener('submit', loginHandler);
+  }
 
-// Add event listener for the "Sign Up" button
-document.querySelector('#signup-button').addEventListener('click', () => {
-  document.location.replace('/register');
+  const signupButton = document.querySelector('#signup-button');
+  if (signupButton) {
+    signupButton.addEventListener('click', () => {
+      document.location.replace('/register');
+    });
+  }
 });

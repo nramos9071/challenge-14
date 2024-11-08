@@ -1,7 +1,8 @@
 [
     {
-        "username": "nramos",
-        "password": "password"
+        "username": "admin",
+        "password": "password",
+        "bio": "I am the admin"
     }
 
 ]
