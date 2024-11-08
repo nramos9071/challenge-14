@@ -35,7 +35,9 @@ User.init({
         },
     },
     sequelize,
-    timestamps: false,
+    timestamps: true, // Ensure timestamps are enabled
+    createdAt: 'created_at', // Use custom column name for createdAt
+    updatedAt: 'updated_at', // Use custom column name for updatedAt
     freezeTableName: true,
     underscored: true,
     modelName: 'user',

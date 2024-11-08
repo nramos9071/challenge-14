@@ -1,12 +1,13 @@
 const router = require('express').Router();
-const withAuth = require('../../utils/auth'); // Adjust the path as necessary
+const { Blog, Comment } = require('../../models');
+const withAuth = require('../../utils/auth'); 
 
 // Route to render the homepage
 router.get('/', withAuth, async (req, res) => {
   try {
     const blogData = await Blog.findAll({
       limit: 10,
-      order: [['createdAt', 'DESC']],
+      order: [['created_at', 'DESC']],
       include: [
         {
           model: Comment,

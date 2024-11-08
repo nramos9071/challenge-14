@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const  User  = require('../../models'); 
+const { User } = require('../../models'); 
 
 // Route to get a user's profile
 router.get('/profile/:id', async (req, res) => {
@@ -66,7 +66,8 @@ router.post('/login', async (req, res) => {
         res.status(200).json(newUser);
       });
     } catch (err) {
-      res.status(400).json(err);
+      console.error(err); // Log the error to the console
+      res.status(400).json({ message: 'Failed to register', error: err.message });
     }
   });
 

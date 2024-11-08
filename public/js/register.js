@@ -22,7 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (response.ok) {
         document.location.replace('/login');
       } else {
-        alert('Failed to register');
+        const errorData = await response.json();
+        alert(`Failed to register: ${errorData.message}`);
       }
     });
   });

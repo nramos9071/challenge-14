@@ -1,18 +1,31 @@
-<div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homepage</title>
+</head>
+<body>
+    <div>
+        <h2>Welcome to the Tech Spot</h2>
+        <p>What would you like to talk about?</p>
+        <input type="textbox" id="post" placeholder="Whats on your mind?">
+        <button id="post-button">Post</button>
+    </div>
+
+
+  <div>
     <h2>Current Blogs</h2>
-
     <section>
-        {{#each blogs}}
-            <article>
-                <h3>{{this.title}}</h3>
-                <p>{{this.content}}</p>
-                <p>Author: {{this.author}}</p>
-                <p>Date Created: {{this.date_created}}</p>
-
-
-            </article>
-        {{/each}}
-
-
+      {{#each blogs}}
+        <article>
+          <h3>{{this.title}}</h3>
+          <p>{{this.content}}</p>
+          <p>Author: {{this.author}}</p>
+          <p>Date Created: {{this.date_created}}</p>
+        </article>
+      {{/each}}
     </section>
-</div>
+  </div>
+</body>
+</html>
