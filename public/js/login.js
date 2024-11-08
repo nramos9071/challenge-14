@@ -17,4 +17,11 @@ const loginHandler = async (event) => {
       alert('Failed to log in.');
     }
   }
-}
+};
+
+document.querySelector('#login-form').addEventListener('submit', loginHandler);
+
+// Add event listener for the "Sign Up" button
+document.querySelector('#signup-button').addEventListener('click', () => {
+  document.location.replace('/register');
+});

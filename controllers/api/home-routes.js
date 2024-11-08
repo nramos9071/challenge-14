@@ -24,4 +24,14 @@ router.get('/login', (req, res) => {
   res.render('login');
 });
 
+router.get('/register', (req, res) => {
+  // If the user is already logged in, redirect to the homepage
+  if (req.session.logged_in) {
+    res.redirect('/');
+    return;
+  }
+
+  res.render('registerpage'); // Ensure this matches the name of your register view
+});
+
 module.exports = router;
