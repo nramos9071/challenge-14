@@ -32,6 +32,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use((req, res, next) => {
+    res.locals.isLoggedIn = req.session.isLoggedIn || false;
+    next();
+});
+
 app.use(routes);
 
 sequelize.sync({ force: true }).then(() => {

@@ -47,66 +47,56 @@ router.get('/update-bio/:id', async (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
-    try {
-      const userData = await User.findOne({ where: { username : req.body.username } });
-  
-      if (!userData) {
-        res.status(400).json({ message: 'Incorrect email or password, please try again' });
-        return;
+  try {
+      const user = await User.findOne({ where: { username: req.body.username } });
+
+      if (!user || !(await user.checkPassword(req.body.password))) {
+          return res.status(400).json({ message: 'Incorrect username or password' });
       }
-  
-      const validPassword = await userData.checkPassword(req.body.password);
-  
-      if (!validPassword) {
-        res.status(400).json({ message: 'Incorrect email or password, please try again' });
-        return;
-      }
-  
+
       req.session.save(() => {
-        req.session.user_id = userData.id;
-        req.session.logged_in = true;
-  
-        res.json({ user: userData, message: 'You are now logged in!' });
+          req.session.user_id = user.id;
+          req.session.isLoggedIn = true;
+
+          res.status(200).json({ user, message: 'You are now logged in!' });
       });
-  
-    } catch (err) {
+  } catch (err) {
       console.error(err); // Log the error to the console
       res.status(500).json({ message: 'Failed to log in', error: err.message });
-    }
-  });
+  }
+});
 
-  router.post('/register', async (req, res) => {
-    try {
+router.post('/register', async (req, res) => {
+  try {
       const newUser = await User.create({
-        username: req.body.username,
-        password: req.body.password,
+          username: req.body.username,
+          password: req.body.password,
       });
-  
+
       req.session.save(() => {
-        req.session.user_id = newUser.id;
-        req.session.logged_in = true;
-  
-        res.status(200).json(newUser);
+          req.session.user_id = newUser.id;
+          req.session.isLoggedIn = true;
+
+          res.status(200).json(newUser);
       });
-    } catch (err) {
+  } catch (err) {
       console.error(err); // Log the error to the console
-      res.status(400).json({ message: 'Failed to register', error: err.message });
-    }
-  });
+      if (err.name === 'SequelizeUniqueConstraintError') {
+          res.status(400).json({ message: 'Username already exists' });
+      } else {
+          res.status(500).json({ message: 'Failed to register', error: err.message });
+      }
+  }
+});
 
   router.post('/logout', (req, res) => {
-    if (req.session.logged_in) {
-      req.session.destroy((err) => {
+    req.session.destroy(err => {
         if (err) {
-          res.status(500).json({ message: 'Failed to log out' });
-        } else {
-          res.status(204).end();
+            return res.status(500).json({ message: 'Failed to log out' });
         }
-      });
-    } else {
-      res.status(404).end();
-    }
-  });
+        res.json({ message: 'Logged out' });
+    });
+});
 
   router.put('/profile/:id', async (req, res) => {
     try {

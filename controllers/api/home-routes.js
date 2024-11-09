@@ -28,6 +28,13 @@ router.get('/', withAuth, async (req, res) => {
   }
 });
 
+router.get('/', (req, res) => {
+  res.render('main', {
+      isLoggedIn: req.session.isLoggedIn,
+      user_id: req.session.user_id
+  });
+});
+
 // Route to render the login page
 router.get('/login', (req, res) => {
   // If the user is already logged in, redirect to the homepage
