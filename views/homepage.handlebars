@@ -6,13 +6,25 @@
   <title>Homepage</title>
 </head>
 <body>
-    <div>
-        <h2>Welcome to the Tech Spot</h2>
-        <p>What would you like to talk about?</p>
-        <input type="textbox" id="post" placeholder="Whats on your mind?">
-        <button id="post-button">Post</button>
-    </div>
-
+  <div>
+    <h2>Welcome to the Tech Spot</h2>
+    <p>What would you like to talk about?</p>
+    <form id="post-form">
+      <div>
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" placeholder="Enter the title" required>
+      </div>
+      <div>
+        <label for="content">Content:</label>
+        <textarea id="content" name="content" placeholder="What's on your mind?" required></textarea>
+      </div>
+      <div>
+        <label for="author">Author:</label>
+        <input type="text" id="author" name="author" placeholder="Enter your name" required>
+      </div>
+      <button type="submit" id="post-button">Post</button>
+    </form>
+  </div>
 
   <div>
     <h2>Current Blogs</h2>
@@ -27,5 +39,7 @@
       {{/each}}
     </section>
   </div>
+
+  <script src="/js/postBlog.js"></script>
 </body>
 </html>

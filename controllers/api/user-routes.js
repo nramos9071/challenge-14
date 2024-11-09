@@ -94,6 +94,20 @@ router.post('/login', async (req, res) => {
     }
   });
 
+  router.post('/logout', (req, res) => {
+    if (req.session.logged_in) {
+      req.session.destroy((err) => {
+        if (err) {
+          res.status(500).json({ message: 'Failed to log out' });
+        } else {
+          res.status(204).end();
+        }
+      });
+    } else {
+      res.status(404).end();
+    }
+  });
+
   router.put('/profile/:id', async (req, res) => {
     try {
       const updatedUser = await User.update(

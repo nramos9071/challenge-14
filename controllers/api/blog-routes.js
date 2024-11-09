@@ -56,4 +56,20 @@ router.get('/:id', withAuth, async (req, res) => {
 
 router.use('/:blogId/comments', commentRoutes);
 
+router.post('/', async (req, res) => {
+  try {
+    const newBlog = await Blog.create({
+      title: req.body.title,
+      content: req.body.content,
+      author: req.body.author,
+      date_created: new Date(),
+    });
+
+    res.status(200).json(newBlog);
+  } catch (err) {
+    console.error(err); // Log the error to the console
+    res.status(400).json({ message: 'Failed to create blog post', error: err.message });
+  }
+});
+
 module.exports = router;

@@ -21,7 +21,7 @@ router.get('/', withAuth, async (req, res) => {
     res.render('homepage', {
       blogs,
       logged_in: req.session.logged_in,
-      user_id: req.session.user_id, // Pass the user ID to the template
+      user: req.user, // Pass the user data to the template
     });
   } catch (err) {
     res.status(500).json(err);
