@@ -48,9 +48,18 @@ router.get('/update-bio/:id', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   try {
+      console.log('Request Body:', req.body);
+
       const user = await User.findOne({ where: { username: req.body.username } });
 
-      if (!user || !(await user.checkPassword(req.body.password))) {
+      if (!user) {
+          console.log('User not found');
+          return res.status(400).json({ message: 'Incorrect username or password' });
+      }
+
+      const validPassword = await user.checkPassword(req.body.password);
+      if (!validPassword) {
+          console.log('Invalid password');
           return res.status(400).json({ message: 'Incorrect username or password' });
       }
 
@@ -61,7 +70,7 @@ router.post('/login', async (req, res) => {
           res.status(200).json({ user, message: 'You are now logged in!' });
       });
   } catch (err) {
-      console.error(err); // Log the error to the console
+      console.error('Error:', err); // Log the error to the console
       res.status(500).json({ message: 'Failed to log in', error: err.message });
   }
 });
