@@ -48,82 +48,81 @@ router.get('/update-bio/:id', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   try {
-      console.log('Request Body:', req.body);
+    const userData = await User.findOne({ where: { username: req.body.username } });
 
-      const user = await User.findOne({ where: { username: req.body.username } });
+    if (!userData) {
+      res.status(400).json({ message: 'Incorrect username or password, please try again' });
+      return;
+    }
 
-      if (!user) {
-          console.log('User not found');
-          return res.status(400).json({ message: 'Incorrect username or password' });
-      }
+    const validPassword = await userData.checkPassword(req.body.password);
 
-      const validPassword = await user.checkPassword(req.body.password);
-      if (!validPassword) {
-          console.log('Invalid password');
-          return res.status(400).json({ message: 'Incorrect username or password' });
-      }
+    if (!validPassword) {
+      res.status(400).json({ message: 'Incorrect username or password, please try again' });
+      return;
+    }
 
-      req.session.save(() => {
-          req.session.user_id = user.id;
-          req.session.isLoggedIn = true;
+    req.session.save(() => {
+      req.session.user_id = userData.id;
+      req.session.logged_in = true;
 
-          res.status(200).json({ user, message: 'You are now logged in!' });
-      });
+      res.json({ user: userData, message: 'You are now logged in!' });
+    });
+
   } catch (err) {
-      console.error('Error:', err); // Log the error to the console
-      res.status(500).json({ message: 'Failed to log in', error: err.message });
+    console.error(err); // Log the error to the console
+    res.status(500).json({ message: 'Failed to log in', error: err.message });
   }
 });
 
 router.post('/register', async (req, res) => {
   try {
-      const newUser = await User.create({
-          username: req.body.username,
-          password: req.body.password,
-      });
+    const newUser = await User.create({
+      username: req.body.username,
+      password: req.body.password,
+    });
 
-      req.session.save(() => {
-          req.session.user_id = newUser.id;
-          req.session.isLoggedIn = true;
+    req.session.save(() => {
+      req.session.user_id = newUser.id;
+      req.session.logged_in = true;
 
-          res.status(200).json(newUser);
-      });
+      res.status(200).json(newUser);
+    });
   } catch (err) {
-      console.error(err); // Log the error to the console
-      if (err.name === 'SequelizeUniqueConstraintError') {
-          res.status(400).json({ message: 'Username already exists' });
-      } else {
-          res.status(500).json({ message: 'Failed to register', error: err.message });
-      }
+    console.error(err); // Log the error to the console
+    if (err.name === 'SequelizeUniqueConstraintError') {
+      res.status(400).json({ message: 'Username already exists' });
+    } else {
+      res.status(500).json({ message: 'Failed to register', error: err.message });
+    }
   }
 });
 
-  router.post('/logout', (req, res) => {
-    req.session.destroy(err => {
-        if (err) {
-            return res.status(500).json({ message: 'Failed to log out' });
-        }
-        res.json({ message: 'Logged out' });
-    });
+router.post('/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      return res.status(500).json({ message: 'Failed to log out' });
+    }
+    res.json({ message: 'Logged out' });
+  });
 });
 
-  router.put('/profile/:id', async (req, res) => {
-    try {
-      const updatedUser = await User.update(
-        { bio: req.body.bio },
-        { where: { id: req.params.id } }
-      );
-  
-      if (!updatedUser) {
-        res.status(404).json({ message: 'No user found with this id!' });
-        return;
-      }
-  
-      res.status(200).json({ message: 'Bio updated successfully!' });
-    } catch (err) {
-      console.error(err); // Log the error to the console
-      res.status(500).json({ message: 'Failed to update bio', error: err.message });
-    }
-  });
+router.put('/profile/:id', async (req, res) => {
+  try {
+    const updatedUser = await User.update(
+      { bio: req.body.bio },
+      { where: { id: req.params.id } }
+    );
 
+    if (!updatedUser) {
+      res.status(404).json({ message: 'No user found with this id!' });
+      return;
+    }
+
+    res.status(200).json({ message: 'Bio updated successfully!' });
+  } catch (err) {
+    console.error(err); // Log the error to the console
+    res.status(500).json({ message: 'Failed to update bio', error: err.message });
+  }
+});
 module.exports = router;
