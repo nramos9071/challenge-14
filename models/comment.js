@@ -5,9 +5,11 @@ class Comment extends Model {}
 
 Comment.init(
   {
-    author: {
-      type: DataTypes.STRING,
+    id: {
+      type: DataTypes.INTEGER,
       allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
     },
     content: {
       type: DataTypes.TEXT,
@@ -25,12 +27,17 @@ Comment.init(
         key: 'id',
       },
     },
+    user_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'user',
+        key: 'id',
+      },
+    },
   },
   {
     sequelize,
-    timestamps: true, // Ensure timestamps are enabled
-    createdAt: 'created_at', // Use custom column name for createdAt
-    updatedAt: 'updated_at', // Use custom column name for updatedAt
+    timestamps: false,
     freezeTableName: true,
     underscored: true,
     modelName: 'comment',

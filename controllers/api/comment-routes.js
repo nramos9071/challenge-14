@@ -1,18 +1,30 @@
 const router = require('express').Router();
-const { Comment } = require('../../models'); // Adjust the path as necessary
-const withAuth = require('../../utils/auth'); // Middleware to check if the user is logged in
+const { Comment, User } = require('../../models');
+const withAuth = require('../../utils/auth');
 
-// Route to post a new comment
 router.post('/', withAuth, async (req, res) => {
   try {
     const newComment = await Comment.create({
-      ...req.body,
-      user_id: req.session.user_id, // Assuming you store the user ID in the session
+      content: req.body.content,
+      blog_id: req.body.blog_id,
+      user_id: req.session.user_id,
+      date_created: new Date(),
     });
 
-    res.status(200).json(newComment);
+    // Fetch the user information to include in the response
+    const commentWithUser = await Comment.findByPk(newComment.id, {
+      include: [
+        {
+          model: User,
+          attributes: ['username'],
+        },
+      ],
+    });
+
+    res.status(200).json(commentWithUser);
   } catch (err) {
-    res.status(400).json(err);
+    console.error(err);
+    res.status(400).json({ message: 'Failed to post comment', error: err.message });
   }
 });
 

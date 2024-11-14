@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { Blog, Comment } = require('../../models');
+const { Blog, Comment, User } = require('../../models'); // Ensure User model is imported
 const withAuth = require('../../utils/auth'); 
 
 // Route to render the homepage
@@ -7,11 +7,21 @@ router.get('/', withAuth, async (req, res) => {
   try {
     const blogData = await Blog.findAll({
       limit: 10,
-      order: [['created_at', 'DESC']],
+      order: [['date_created', 'DESC']],
       include: [
         {
           model: Comment,
-          attributes: ['author', 'content', 'date_created'],
+          attributes: ['id', 'content', 'date_created'],
+          include: [
+            {
+              model: User,
+              attributes: ['username'],
+            },
+          ],
+        },
+        {
+          model: User,
+          attributes: ['username'],
         },
       ],
     });
@@ -24,6 +34,7 @@ router.get('/', withAuth, async (req, res) => {
       user: req.user, // Pass the user data to the template
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json(err);
   }
 });

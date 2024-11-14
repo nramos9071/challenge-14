@@ -1,28 +1,25 @@
 <div>
-    <section>
-      <article>
-        <h2>{{blog.title}}</h2>
-        <p>{{blog.content}}</p>
-        <p>Author: {{blog.author}}</p>
-        <p>Date Created: {{blog.date_created}}</p>
-      </article>
-      <hr>
-    <h3>Comments</h3>
-    <section>
-      {{#each blog.comments}}
-        <div>
-          <p><strong>{{this.author}}</strong> on {{this.date_created}}</p>
-          <p>{{this.content}}</p>
-        </div>
-      {{/each}}
-    </section>
-    <hr>
-    <h3>Add a Comment</h3>
-    <form id="comment-form">
-      <textarea id="comment-content" name="content" rows="4" cols="50" placeholder="Add your comment here"></textarea>
-      <button type="submit">Submit</button>
-    </form>
-  </section>
+  <article>
+    <h2>{{blog.title}}</h2>
+    <p>{{blog.content}}</p>
+    <p>Author: {{user.username}}</p>
+    <p>Date Created: {{blog.date_created}}</p>
+  </article>
+  <hr>
+  <h2>Comments</h2>
+  <ul id="comments-list">
+    {{#each comments}}
+      <li>
+        <p><strong>{{user.username}}:</strong> {{content}}</p>
+        <p>Date: {{date_created}}</p>
+      </li>
+    {{/each}}
+  </ul>
+
+  <form id="comment-form">
+    <textarea id="comment-content" placeholder="Add a comment" required></textarea>
+    <button type="submit">Post Comment</button>
+  </form>
   <script src="/js/logout.js"></script>
   <script src="/js/comment.js"></script>
 </div>

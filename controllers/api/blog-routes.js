@@ -1,5 +1,5 @@
 const router = require('express').Router();
-
+const User = require('../../models/user');
 const Blog = require('../../models/blog');
 const Comment = require('../../models/comment');
 const withAuth = require('../../utils/auth');
@@ -8,10 +8,18 @@ const commentRoutes = require('./comment-routes');
 router.get('/', withAuth, async (req, res) => {
   try {
     const blogData = await Blog.findAll({
+      limit: 10,
+      order: [['date_created', 'DESC']],
       include: [
         {
           model: Comment,
-          attributes: ['author', 'content', 'date_created'],
+          attributes: ['id', 'content', 'date_created'],
+          include: [
+            {
+              model: User,
+              attributes: ['username'],
+            },
+          ],
         },
       ],
     });
@@ -21,30 +29,9 @@ router.get('/', withAuth, async (req, res) => {
     res.render('blogpage', {
       blogs,
       logged_in: req.session.logged_in,
-    });
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
-
-router.get('/:id', async (req, res) => {
-  try {
-    console.log('Fetching blog with ID:', req.params.id); // Add this line
-
-    const blogData = await Blog.findByPk(req.params.id, {
-      attributes: ['id', 'title', 'content', 'author', 'date_created'],
-    });
-
-    if (!blogData) {
-      res.status(404).json({ message: 'No blog found with this id!' });
-      return;
-    }
-
-    const blog = blogData.get({ plain: true });
-
-    res.render('single-blogpage', {
-      blog,
-      isLoggedIn: req.session.isLoggedIn,
+      user: req.user, // Pass the user data to the template
+      username: req.user.username, // Pass the username to the template
+      user_id: req.user.id, // Pass the user_id to the template
     });
   } catch (err) {
     console.error(err); // Log the error to the console
@@ -52,17 +39,67 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+router.get('/:id', withAuth, async (req, res) => {
+  try {
+    const blogData = await Blog.findByPk(req.params.id, {
+      include: [
+        {
+          model: Comment,
+          include: [
+            {
+              model: User,
+              attributes: ['username'],
+            },
+          ],
+        },
+        {
+          model: User,
+          attributes: ['username'],
+        },
+      ],
+    });
+
+    if (!blogData) {
+      res.status(404).json({ message: 'No blog found with this id' });
+      return;
+    }
+
+    const blog = blogData.get({ plain: true });
+
+    res.render('single-blogpage', {
+      ...blog,
+      logged_in: req.session.logged_in,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json(err);
+  }
+});
+
 router.get('/blogs', async (req, res) => {
   try {
     const blogData = await Blog.findAll({
-      attributes: ['id', 'title', 'content', 'author', 'date_created'],
+      order: [['date_created', 'DESC']],
+      include: [
+        {
+          model: Comment,
+          attributes: ['id', 'content', 'date_created'],
+          include: [
+            {
+              model: User,
+              attributes: ['username'],
+            },
+          ],
+        },
+      ],
     });
 
-    const blogs = blogData.map(blog => blog.get({ plain: true }));
+    const blogs = blogData.map((blog) => blog.get({ plain: true }));
 
     res.render('blogpage', {
       blogs,
-      isLoggedIn: req.session.isLoggedIn,
+      logged_in: req.session.logged_in,
+      user_id: req.session.user_id,
     });
   } catch (err) {
     console.error(err); // Log the error to the console
@@ -74,12 +111,13 @@ router.use('/:blogId/comments', commentRoutes);
 
 
 
-router.post('/', async (req, res) => {
+router.post('/', withAuth, async (req, res) => {
   try {
     const newBlog = await Blog.create({
       title: req.body.title,
       content: req.body.content,
-      author: req.body.author,
+      username: req.body.username,
+      user_id: req.body.user_id, // Include the user_id
       date_created: new Date(),
     });
 
@@ -92,14 +130,33 @@ router.post('/', async (req, res) => {
 
 router.post('/:id/comments', withAuth, async (req, res) => {
   try {
+    if (!req.body.content) {
+      res.status(400).json({ message: 'Comment content cannot be empty' });
+      return;
+    }
+
+    // Fetch the username from the User model based on the user_id stored in the session
+    const user = await User.findByPk(req.session.user_id, {
+      attributes: ['username'],
+    });
+
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+
     const newComment = await Comment.create({
       content: req.body.content,
       blog_id: req.params.id,
       user_id: req.session.user_id,
     });
 
-    res.status(200).json(newComment);
+    res.status(200).json({
+      ...newComment.get({ plain: true }),
+      username: user.username,
+    });
   } catch (err) {
+    console.error('Error creating comment:', err);
     res.status(500).json(err);
   }
 });
