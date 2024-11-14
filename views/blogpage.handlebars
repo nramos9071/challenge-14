@@ -2,7 +2,7 @@
   <section>
     {{#each blogs}}
       <article>
-        <h2><a href="/blogs/{{this.id}}">{{this.title}}</a></h2>
+        <h2><a href="/api/blogs/{{this.id}}">{{this.title}}</a></h2>
         <p>{{this.content}}</p>
         <p>Author: {{this.author}}</p>
         <p>Date Created: {{this.date_created}}</p>
