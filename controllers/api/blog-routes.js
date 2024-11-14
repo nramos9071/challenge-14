@@ -27,15 +27,12 @@ router.get('/', withAuth, async (req, res) => {
   }
 });
 
-router.get('/:id', withAuth, async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
+    console.log('Fetching blog with ID:', req.params.id); // Add this line
+
     const blogData = await Blog.findByPk(req.params.id, {
-      include: [
-        {
-          model: Comment,
-          attributes: ['author', 'content', 'date_created'],
-        },
-      ],
+      attributes: ['id', 'title', 'content', 'author', 'date_created'],
     });
 
     if (!blogData) {
@@ -45,11 +42,12 @@ router.get('/:id', withAuth, async (req, res) => {
 
     const blog = blogData.get({ plain: true });
 
-    res.render('blogpage', {
+    res.render('single-blogpage', {
       blog,
-      logged_in: req.session.logged_in,
+      isLoggedIn: req.session.isLoggedIn,
     });
   } catch (err) {
+    console.error(err); // Log the error to the console
     res.status(500).json(err);
   }
 });
@@ -57,15 +55,14 @@ router.get('/:id', withAuth, async (req, res) => {
 router.get('/blogs', async (req, res) => {
   try {
     const blogData = await Blog.findAll({
-      order: [['created_at', 'DESC']],
+      attributes: ['id', 'title', 'content', 'author', 'date_created'],
     });
 
-    const blogs = blogData.map((blog) => blog.get({ plain: true }));
+    const blogs = blogData.map(blog => blog.get({ plain: true }));
 
     res.render('blogpage', {
       blogs,
-      logged_in: req.session.logged_in,
-      user_id: req.session.user_id,
+      isLoggedIn: req.session.isLoggedIn,
     });
   } catch (err) {
     console.error(err); // Log the error to the console
