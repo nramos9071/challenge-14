@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { User } = require('../../models'); 
+const { Op } = require('sequelize');
 
 // Route to get a user's profile
 router.get('/profile/:id', async (req, res) => {
@@ -49,30 +50,56 @@ router.get('/update-bio/:id', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   try {
-    const user = await User.findOne({ where: { username: req.body.username } });
+    console.log('Login request received:', req.body);
 
-    if (!user || !(await user.checkPassword(req.body.password))) {
-      return res.status(400).json({ message: 'Incorrect username or password' });
+    const userData = await User.findOne({
+      where: {
+        username: {
+          [Op.iLike]: req.body.username // Case-insensitive comparison
+        }
+      }
+    });
+
+    if (!userData) {
+      console.log('User not found:', req.body.username);
+      res.status(400).json({ message: 'Incorrect username or password, please try again' });
+      return;
+    }
+
+    console.log('User found:', userData.username); // Add logging
+
+    const validPassword = await userData.checkPassword(req.body.password);
+
+    console.log('Password comparison result:', validPassword); // Log the password comparison result
+
+    if (!validPassword) {
+      console.log('Invalid password for user:', req.body.username);
+      res.status(400).json({ message: 'Incorrect username or password, please try again' });
+      return;
     }
 
     req.session.save(() => {
-      req.session.user_id = user.id;
-      req.session.isLoggedIn = true;
+      req.session.user_id = userData.id;
+      req.session.logged_in = true;
 
-      res.status(200).json({ user, message: 'You are now logged in!' });
+      res.json({ user: userData, message: 'You are now logged in!' });
     });
+
   } catch (err) {
-    console.error(err); // Log the error to the console
+    console.error('Error during login:', err); // Log the error to the console
     res.status(500).json({ message: 'Failed to log in', error: err.message });
   }
 });
 
+// Route to handle user registration
 router.post('/register', async (req, res) => {
   try {
     const newUser = await User.create({
       username: req.body.username,
       password: req.body.password,
     });
+
+    console.log('New user created:', newUser); // Add logging
 
     req.session.save(() => {
       req.session.user_id = newUser.id;
@@ -81,7 +108,7 @@ router.post('/register', async (req, res) => {
       res.status(200).json(newUser);
     });
   } catch (err) {
-    console.error(err); // Log the error to the console
+    console.error('Error during registration:', err); // Log the error to the console
     if (err.name === 'SequelizeUniqueConstraintError') {
       res.status(400).json({ message: 'Username already exists' });
     } else {

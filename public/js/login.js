@@ -4,6 +4,8 @@ const loginHandler = async (event) => {
   const username = document.querySelector('#username').value.trim();
   const password = document.querySelector('#password').value.trim();
 
+  console.log('Login attempt with username:', username); // Add logging
+
   if (username && password) {
     const response = await fetch('/api/users/login', {
       method: 'POST',
@@ -25,11 +27,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (loginForm) {
     loginForm.addEventListener('submit', loginHandler);
   }
-});
 
   const signupButton = document.querySelector('#signup-button');
   if (signupButton) {
     signupButton.addEventListener('click', () => {
       document.location.replace('/register');
     });
-  };
+  }
+});
