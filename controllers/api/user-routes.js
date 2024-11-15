@@ -1,6 +1,7 @@
 const router = require('express').Router();
-const { User } = require('../../models'); 
+const { User, Comment, Blog } = require('../../models'); 
 const { Op } = require('sequelize');
+const withAuth = require('../../utils/auth'); 
 
 // Route to get a user's profile
 router.get('/profile/:id', async (req, res) => {
@@ -117,13 +118,14 @@ router.post('/register', async (req, res) => {
   }
 });
 
-router.post('/logout', (req, res) => {
-  req.session.destroy(err => {
-    if (err) {
-      return res.status(500).json({ message: 'Failed to log out' });
-    }
-    res.json({ message: 'Logged out' });
-  });
+router.post('/logout', withAuth, (req, res) => {
+  if (req.session.logged_in) {
+    req.session.destroy(() => {
+      res.status(204).end();
+    });
+  } else {
+    res.status(404).end();
+  }
 });
 
 router.put('/profile/:id', async (req, res) => {
@@ -144,4 +146,43 @@ router.put('/profile/:id', async (req, res) => {
     res.status(500).json({ message: 'Failed to update bio', error: err.message });
   }
 });
+
+router.delete('/delete', withAuth, async (req, res) => {
+  try {
+    const userId = req.session.user_id;
+
+    // Delete related comments and blogs first
+    await Comment.destroy({
+      where: {
+        user_id: userId,
+      },
+    });
+
+    await Blog.destroy({
+      where: {
+        user_id: userId,
+      },
+    });
+
+    // Delete the user
+    const userData = await User.destroy({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!userData) {
+      res.status(404).json({ message: 'No user found with this id' });
+      return;
+    }
+
+    req.session.destroy(() => {
+      res.status(204).end();
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json(err);
+  }
+});
+
 module.exports = router;
