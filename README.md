@@ -4,6 +4,7 @@
 * [Description](#description)
 * [Github](#github)
 * [Deployed_Page](#deployed-page)
+* [Website_Screenshots](#website-screenshots)
 * [Installation](#installation)
 * [Usage](#usage)
 * [License](#license)
@@ -21,7 +22,15 @@ A blog designed to allow discussion about tech issues.
 
 ## Deployed Page
 
-https://drive.google.com/file/d/1D1b-hh_UoQc-yafJGpNd-Z6C5L67wiI_/view
+https://challenge-14-g18m.onrender.com 
+
+## Website Screenshots
+
+![HomePage](./public/Images/homepage.png)
+![Logged-In](./public/Images/logged-in.png)
+![Blogpost](./public/Images/blogpost-with-comments.png)
+
+
 
 ## Installation
 Postgres, Express, Sequelize, Dotenv.
